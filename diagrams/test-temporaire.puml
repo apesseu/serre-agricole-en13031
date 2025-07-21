@@ -1,7 +1,0 @@
-@startuml
-title Test PlantUML
-start
-:Hello;
-:World;
-stop
-@enduml
