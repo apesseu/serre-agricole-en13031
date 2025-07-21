@@ -1,1 +1,7 @@
-@startuml\nstart\n:Test GitHub;\nstop\n@enduml
+@startuml
+title Test PlantUML
+start
+:Hello;
+:World;
+stop
+@enduml
