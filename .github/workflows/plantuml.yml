@@ -3,18 +3,18 @@ name: PlantUML Diagram Generation & Deploy
 on:
   push:
     branches:
-      - test-plantuml
-
+      - main      # Déclenche quand tu pushes sur main
+    
 jobs:
-  build-and-deploy:
+  generate-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout du dépôt
+      # 1️⃣ Récupération du repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Installer Java et Graphviz
+      # 2️⃣ Installer Java et Graphviz
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -26,52 +26,49 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y graphviz
 
-      # 3. Télécharger PlantUML
+      # 3️⃣ Télécharger PlantUML
       - name: Download PlantUML
         run: |
           curl -L -o plantuml.jar "https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar"
-          if [ ! -s plantuml.jar ]; then
-            echo "❌ PlantUML n’a pas été téléchargé !"
-            exit 1
-          fi
-          echo "✅ PlantUML téléchargé : $(ls -lh plantuml.jar)"
+          ls -lh plantuml.jar
 
-      # 4. Vérifier les fichiers .puml trouvés
-      - name: Check for PUML files
+      # 4️⃣ Vérifier les fichiers .puml
+      - name: Check .puml files
         run: |
           echo "🔍 Recherche des fichiers .puml dans diagrams/"
-          find diagrams -name "*.puml" -type f || echo "⚠️ Aucun fichier .puml trouvé"
+          find diagrams -name "*.puml" || echo "⚠️ Aucun fichier .puml trouvé !"
 
-      # 5. Génération des SVG
-      - name: Generate SVGs
+      # 5️⃣ Générer les SVG dans docs/
+      - name: Generate PlantUML diagrams
         run: |
           mkdir -p docs
-          echo "📊 Génération des diagrammes..."
-          java -jar plantuml.jar -tsvg -v diagrams/*.puml
+          echo "📊 Génération des diagrammes PlantUML vers docs/"
+          java -jar plantuml.jar -tsvg -o ../docs diagrams/*.puml
           
-          echo "📂 Contenu après génération :"
-          find diagrams -name "*.svg"
-
-          echo "📦 Copie dans docs/"
-          cp diagrams/*.svg docs/ || echo "⚠️ Aucun SVG à copier"
-
-          echo "📂 Contenu final de docs/"
+          echo "📂 Contenu de docs/ après génération :"
           ls -la docs/
 
-      # 6. Créer un index.html pour lister les SVG
-      - name: Generate index.html
+      # 6️⃣ Créer une page index.html listant les SVG
+      - name: Create index.html for GitHub Pages
         run: |
-          echo "<html><head><title>PlantUML Diagrams</title></head><body>" > docs/index.html
-          echo "<h1>Liste des diagrammes générés</h1><ul>" >> docs/index.html
-          for f in docs/*.svg; do
-            fname=$(basename "$f")
-            echo "<li><a href=\"$fname\">$fname</a></li>" >> docs/index.html
+          echo "<html><head><title>PlantUML Diagrams</title></head><body><h1>Liste des diagrammes générés</h1><ul>" > docs/index.html
+          for svg in docs/*.svg; do
+            name=$(basename "$svg")
+            echo "<li><a href=\"$name\">$name</a></li>" >> docs/index.html
           done
           echo "</ul></body></html>" >> docs/index.html
 
-          echo "✅ index.html créé dans docs/"
+      # 7️⃣ Vérifier qu'il y a bien des SVG
+      - name: Verify SVG generation
+        run: |
+          svg_count=$(find docs -name "*.svg" | wc -l)
+          echo "📈 Nombre total de fichiers SVG : $svg_count"
+          if [ "$svg_count" -eq 0 ]; then
+            echo "❌ Aucun fichier SVG généré, on arrête."
+            exit 1
+          fi
 
-      # 7. Déployer sur GitHub Pages (branche gh-pages)
+      # 8️⃣ Déploiement automatique sur GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
