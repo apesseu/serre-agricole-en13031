@@ -1,0 +1,17 @@
+@startuml
+!theme blueprint
+title Test Eurocode EN 1991-1-4
+
+start
+:Déterminer la vitesse de référence vb,0;
+note right
+[[https://eurocodes.com/en1991-1-4-4-2 §4.2 - Vitesse de référence]]
+end note
+
+:Calculer la pression dynamique qp(z);
+note right
+[[https://eurocodes.com/en1991-1-4-4-5 §4.5 - Pression dynamique]]
+end note
+
+stop
+@enduml

@@ -1,0 +1,10 @@
+# Ignorer les fichiers temporaires
+*.tmp
+*.log
+
+# Ignorer les SVG générés localement (on garde que ceux du workflow)
+diagrams/*.svg
+
+# Ignorer les fichiers systèmes
+.DS_Store
+Thumbs.db
