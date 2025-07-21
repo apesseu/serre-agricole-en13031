@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - test-plantuml
-      - main
 
 jobs:
   generate-diagrams:
@@ -36,56 +35,50 @@ jobs:
       - name: Verify PlantUML installation
         run: java -jar plantuml.jar -version
           
-      - name: Check PlantUML files
+      - name: Check PlantUML source files
         run: |
-          echo "Fichiers .puml trouvés :"
-          find diagrams -name "*.puml" -type f || echo "Aucun fichier .puml trouvé"
+          echo "Recherche des fichiers .puml dans diagrams/ ..."
+          find diagrams -name "*.puml" -type f || echo "⚠️ Aucun fichier .puml trouvé dans diagrams/"
           
-      - name: Generate SVG diagrams
+      - name: Generate SVG diagrams in docs/
         shell: bash
         run: |
-          set +e
           mkdir -p docs
           puml_files=$(find diagrams -name "*.puml" -type f | wc -l)
           if [ "$puml_files" -eq 0 ]; then
-            echo "❌ Aucun fichier .puml trouvé dans diagrams/"
+            echo "❌ Aucun fichier .puml trouvé dans diagrams/, impossible de générer les diagrammes"
             exit 1
           fi
-          echo "📊 Génération des diagrammes..."
-          success_count=0
-          error_count=0
-          cd docs
-          for file in ../diagrams/*.puml; do
-            if [ -f "$file" ]; then
-              echo "🔄 Génération de : $file"
-              java -jar ../plantuml.jar -tsvg -v "$file" 2>&1
-              exit_code=$?
-              if [ $exit_code -eq 0 ]; then
-                echo "✅ Succès : $file"
-                success_count=$((success_count + 1))
-              else
-                echo "❌ Erreur lors de la génération de : $file (code : $exit_code)"
-                error_count=$((error_count + 1))
-              fi
-            fi
-          done
-          cd ..
-          echo "📈 Résultats : $success_count succès, $error_count erreurs"
-          if [ $success_count -gt 0 ]; then
-            echo "✅ Au moins un diagramme généré avec succès"
-            exit 0
-          else
-            echo "❌ Aucun diagramme généré"
-            exit 1
+          
+          echo "📊 Génération des diagrammes PlantUML en SVG vers docs/ ..."
+          java -jar plantuml.jar -tsvg -o docs diagrams/*.puml
+          exit_code=$?
+          
+          if [ $exit_code -ne 0 ]; then
+            echo "❌ Erreur lors de la génération des diagrammes (code $exit_code)"
+            exit $exit_code
           fi
-
-      - name: List generated files
+          
+          echo "✅ Génération terminée."
+          
+          echo "📂 Contenu du dossier docs/ après génération :"
+          ls -la docs/ || echo "⚠️ Le dossier docs/ est vide"
+          
+          echo "🔍 Recherche détaillée des fichiers SVG générés (récursif):"
+          find docs -name "*.svg" -print || echo "⚠️ Aucun fichier SVG trouvé dans docs/"
+          
+      - name: Summary of generated SVG files
         run: |
-          echo "Fichiers générés dans docs/:"
-          ls -la docs/ || echo "Le dossier docs/ est vide"
           svg_count=$(find docs -name "*.svg" | wc -l)
-          echo "Nombre de fichiers SVG : $svg_count"
-
+          echo "📈 Nombre total de fichiers SVG générés dans docs/ : $svg_count"
+          
+          if [ "$svg_count" -eq 0 ]; then
+            echo "❌ Aucun fichier SVG généré, vérifier la génération."
+            exit 1
+          else
+            echo "✅ Fichiers SVG générés avec succès."
+          fi
+          
       - name: Deploy to GitHub Pages
         if: success()
         uses: peaceiris/actions-gh-pages@v3
