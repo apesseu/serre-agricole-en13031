@@ -18,6 +18,4 @@ jobs:
       - name: Generate diagrams (TEST)
         run: |
           mkdir -p docs
-          for f in diagrams/*.puml; do
-            plantuml -tsvg "$f" -o ../docs
-          done
+          plantuml -tsvg diagrams/test-ok.puml -o docs
