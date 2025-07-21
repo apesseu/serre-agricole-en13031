@@ -1,8 +1,10 @@
 name: PlantUML Diagram Generation
+
 on:
   push:
     branches:
       - test-plantuml
+      - main
 
 jobs:
   generate-diagrams:
@@ -14,73 +16,61 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '11'
+          distribution: temurin
+          java-version: 11
           
       - name: Install Graphviz
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz
           
-      - name: Download PlantUML (méthode fiable)
+      - name: Download PlantUML
         run: |
           curl -L -o plantuml.jar "https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar"
-          # Vérifier que le fichier existe et n'est pas vide
           if [ ! -f plantuml.jar ] || [ ! -s plantuml.jar ]; then
             echo "❌ Échec du téléchargement de PlantUML"
             exit 1
           fi
-          echo "✅ PlantUML téléchargé: $(ls -lh plantuml.jar)"
+          echo "✅ PlantUML téléchargé : $(ls -lh plantuml.jar)"
           
       - name: Verify PlantUML installation
-        run: |
-          java -jar plantuml.jar -version
+        run: java -jar plantuml.jar -version
           
       - name: Check PlantUML files
         run: |
-          echo "Fichiers .puml trouvés:"
+          echo "Fichiers .puml trouvés :"
           find diagrams -name "*.puml" -type f || echo "Aucun fichier .puml trouvé"
           
       - name: Generate SVG diagrams
         shell: bash
-        continue-on-error: true
         run: |
-          set +e  # Désactiver l'arrêt sur erreur
+          set +e
           mkdir -p docs
-          
-          # Vérifier qu'il y a des fichiers .puml
           puml_files=$(find diagrams -name "*.puml" -type f | wc -l)
           if [ "$puml_files" -eq 0 ]; then
-            echo "❌ Aucun fichier .puml trouvé dans le dossier diagrams/"
+            echo "❌ Aucun fichier .puml trouvé dans diagrams/"
             exit 1
           fi
-          
           echo "📊 Génération des diagrammes..."
           success_count=0
           error_count=0
-          
-          for file in diagrams/*.puml; do
+          cd docs
+          for file in ../diagrams/*.puml; do
             if [ -f "$file" ]; then
-              echo "🔄 Génération de: $file"
-              
-              # Générer avec gestion d'erreur détaillée
-              java -jar plantuml.jar -tsvg -v "$file" -o "./docs" 2>&1
+              echo "🔄 Génération de : $file"
+              java -jar ../plantuml.jar -tsvg -v "$file" 2>&1
               exit_code=$?
-              
               if [ $exit_code -eq 0 ]; then
-                echo "✅ Succès: $file"
+                echo "✅ Succès : $file"
                 success_count=$((success_count + 1))
               else
-                echo "❌ Erreur lors de la génération de: $file (code: $exit_code)"
+                echo "❌ Erreur lors de la génération de : $file (code : $exit_code)"
                 error_count=$((error_count + 1))
-                # Continuer malgré l'erreur
               fi
             fi
           done
-          
-          echo "📈 Résultats: $success_count succès, $error_count erreurs"
-          
-          # L'action continue même s'il y a des erreurs sur certains fichiers
+          cd ..
+          echo "📈 Résultats : $success_count succès, $error_count erreurs"
           if [ $success_count -gt 0 ]; then
             echo "✅ Au moins un diagramme généré avec succès"
             exit 0
@@ -88,16 +78,14 @@ jobs:
             echo "❌ Aucun diagramme généré"
             exit 1
           fi
-          
+
       - name: List generated files
         run: |
           echo "Fichiers générés dans docs/:"
           ls -la docs/ || echo "Le dossier docs/ est vide"
-          
-          # Compter les SVG générés
           svg_count=$(find docs -name "*.svg" | wc -l)
-          echo "Nombre de fichiers SVG: $svg_count"
-          
+          echo "Nombre de fichiers SVG : $svg_count"
+
       - name: Deploy to GitHub Pages
         if: success()
         uses: peaceiris/actions-gh-pages@v3
