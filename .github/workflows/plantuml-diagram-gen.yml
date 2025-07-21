@@ -1,0 +1,35 @@
+
+
+name: PlantUML Diagram Generation
+
+on:
+  push:
+    branches:
+      - test-plantuml
+
+jobs:
+  generate-diagrams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install PlantUML and Graphviz
+        run: sudo apt-get update && sudo apt-get install -y plantuml graphviz
+
+      - name: Generate SVG diagrams
+        run: |
+          mkdir -p docs
+          for file in diagrams/*.puml; do
+            echo "Generating diagram for $file"
+            plantuml -tsvg "$file" -o docs || echo "Error generating $file"
+          done
+          ls -l docs
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
