@@ -1,4 +1,6 @@
-# Dimensionnement des serres agricoles selon EN 13031-1 & Eurocodes
+# Projet : Dimensionnement de Serres Agricoles selon EN 13031 et Eurocodes
+
+Ce projet vise à développer un algorithme complet pour le **dimensionnement des serres agricoles** en respectant la norme **EN 13031-1** et les **Eurocodes (EN 1991-1-4)**.
 
 Ce projet contient :
 
@@ -8,13 +10,19 @@ Ce projet contient :
 
 ## Structure du projet
 
-- `diagrams/` → les fichiers `.puml`
+- `github/workflows/` → Contient les workflows GitHub Actions
+- `diagrams/` → les fichiers source `.puml` des diagrammes
 - `docs/` → les diagrammes `.svg` générés automatiquement
-- `pdf/` → les normes PDF (si hébergées légalement)
+- `pdf/` → les normes PDF 
 - `.github/workflows/` → scripts CI/CD pour générer les SVG
 
 ## Objectif
 
-Faciliter le **dimensionnement normatif des portiques bi-versants** avec traçabilité vers les articles Eurocodes.
+- Faciliter le **dimensionnement normatif des portiques bi-versants** avec traçabilité vers les articles Eurocodes.
+- Automatiser le calcul des actions climatiques (vent, neige)
+- Générer des diagrammes interactifs avec **PlantUML**
+- Créer des liens cliquables vers les articles des normes
+- Assurer un suivi de version et collaboration via GitHub
+
 
 ---
