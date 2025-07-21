@@ -1,29 +1,38 @@
-name: Generate PlantUML Diagrams
+name: PlantUML Diagram Generation
 
 on:
   push:
     branches:
-      - main
+      - test-plantuml
 
 jobs:
-  plantuml:
+  generate-diagrams:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install PlantUML
-        run: sudo apt-get install -y plantuml graphviz
+      - name: Install dependencies (Graphviz, Java, wget)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz default-jre wget
 
-      - name: Generate diagrams
+      - name: Download PlantUML jar
+        run: wget https://sourceforge.net/projects/plantuml/files/plantuml.jar/download -O plantuml.jar
+
+      - name: Generate SVG diagrams
         run: |
           mkdir -p docs
-          for f in diagrams/*.puml; do
-            plantuml -tsvg "$f" -o ../docs
+          for file in diagrams/*.puml; do
+            echo "Generating diagram for $file"
+            java -jar plantuml.jar -tsvg "$file" -o docs || echo "Error generating $file"
           done
+          ls -l docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: docs
+          publish_branch: gh-pages
