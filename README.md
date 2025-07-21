@@ -55,7 +55,7 @@ git clone https://github.com/apesseu/serre-agricole-en13031.git
 cd serre-agricole-en13031
 ```
 - Modifiez les fichiers .puml dans diagrams/.
-- Vous pouvez générer les SVG localement avec PlantUML (Java requis) :
+- Vous pouvez générer les SVG localement avec PlantUML (Java requis) 
 
 ---
 
