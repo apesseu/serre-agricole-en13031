@@ -1,0 +1,110 @@
+@startuml Algorithme_Portique_EN13031_EN1991-1-4
+!theme aws-orange
+
+title
+  <size:16><b>Algorithme de Dimensionnement Portique Bi-versant</b></size>
+  <size:14>EN 13031-1:2019 (clause 10)</size>
+  <size:12>(Combinaisons d’actions applicables aux serres)</size>
+end title
+
+start
+
+:Données d'entrée;
+note right
+  **Actions permanentes:**
+  * Poids propre Gk1
+  * Actions des installations Gk2
+
+  **Actions variables:**
+  * Actions dues au vent Qk1
+  * Actions dues à la neige Qk2
+  * Actions dues aux cultures Qk3
+  * Action verticale concentrée Qk4
+  **Classe de serre**
+end note
+
+partition "**COMBINAISONS D'ACTIONS**" {
+  :Définir combinaisons ELU;
+  note left
+    **NF EN 13031-1/NA2020** [[https://www.google.fr Tableau 4 & Tableau 5]]
+  end note
+  
+  :Définir combinaisons ELS;
+  note right
+    **NF EN 13031-1/NA2020** [[https://www.google.fr Tableau 4 & Tableau 5]]
+  end note
+}
+
+partition "**VERIFICATION RESISTANCE**" {
+  :Vérification poteaux;
+  if (Sollicitation ?) then (Compression + flexion)
+    :Vérifier interaction N/M;
+    note right
+      **Méthode 1:** [[https://lc.cx/5wSfsY#page=67 EN 1993-1-1 Art 6.3.3]]
+      
+      N/NRd + M/MRd ≤ 1.0
+    end note
+    
+    :Vérifier flambement;
+    note right
+      **χ × Nt,Rd ≥ NEd**
+      
+      χ = coefficient réduction flambement
+    end note
+    
+  elseif (Traction simple) then (oui)
+    :NEd ≤ Nt,Rd;
+  else (Flexion simple)
+    :MEd ≤ Mc,Rd;
+  endif
+  
+  :Vérification traverses;
+  note left
+    • Moment de flexion
+    • Effort tranchant  
+    • Déversement
+    • Voilement local
+  end note
+  
+  :Vérification assemblages;
+  if (Type assemblage ?) then (Boulonné)
+    :Vérifier résistance boulons;
+    :• Cisaillement Fv,Rd;
+    :• Pression diamétrale Fb,Rd;
+    :• Traction Ft,Rd;
+    note right: [[https://lc.cx/n4nYWb#page=26 EN 1993-1-8 Art 3.6]]
+    
+  elseif (Soudé) then (oui)
+    :Vérifier cordons soudure;
+    note right: [[https://lc.cx/n4nYWb#page=40 EN 1993-1-8 Art 4]]
+    
+  else (Encastrement)
+    :Vérifier soudures encastrement;
+  endif
+}
+
+partition "**VERIFICATION DEFORMATIONS**" {
+  :Limitation flèches ELS;
+  if (Élément ?) then (Poteaux)
+    :δ ≤ H/300 (général);
+    :δ ≤ H/150 (déplacement horizontal);
+    note right: [[https://www.google.fr EN 13031-1:2019 Tableau 10]]
+    
+  elseif (Traverses) then (oui)
+    :δ ≤ L/300 (flèche verticale);
+    :δ ≤ L/250 (console);
+    
+  else (Pannes)
+    :δ ≤ L/200 (charges permanentes);
+    :δ ≤ L/250 (charges variables);
+  endif
+  
+  :Vérification déplacement global;
+  :δ ≤ H/150 (déplacement sommet);
+  note right
+    Critère confort et aspect
+    Préservation éléments non structuraux
+  end note
+}
+
+@enduml

@@ -1,0 +1,111 @@
+@startuml Algorithme_Portique_EN13031_EN1991-1-4
+!theme aws-orange
+
+title
+  <size:16><b>Algorithme de Dimensionnement Portique Bi-versant</b></size>
+  <size:14>EN 13031 (Annexe C) + EN 1991-1-3</size>
+  <size:12>(Actions de la neige)</size>
+end title
+
+start
+
+:Données d'entrée;
+note right
+  **Géométrie portique:**
+  * Angle pente alpha (°)
+
+  **Localisation:**
+  * Zone climatique
+  * Altitude (m)
+  * Classe de serre
+end note
+
+partition "**CHARGES DE NEIGE**" {
+
+  :Déterminer la valeur caracteristique de la charge de neige au sol sk,0; 
+  note right
+  **EN 1991-1-3:** [[https://lc.cx/f4S8BJ#page=7 Tableau 3 du guide CTICM]]
+  end note
+  
+  if (altitude > 200m) then (oui)
+    :Calculer charges de neige au sol suivant l’altitude;
+    note right
+    **EN 1991-1-3:** [[https://lc.cx/f4S8BJ#page=3 § 3.2 du guide CTICM]]
+    end note
+  else (non)
+  endif
+  :Déterminer le coefficient d’ajustement fs(n); 
+  note right
+  **NF EN 13031-1/NA2020** [[https://www.google.fr Clause 10.2.2.2 (2)]]
+  end note
+  :Corriger la charge de neige au sol sk; 
+  note right 
+  application du coefficient d'ajustement
+  end note
+  :Définir les coefficients du matériau de surface Cm;
+  note right
+  **EN 13031-1:2019** [[https://www.google.fr Annexe C.1]]
+  end note
+  :Calculer le Coefficient thermique Ct;
+  note right
+  **EN 13031-1:2019** [[https://www.google.fr Annexe C.2]]
+  end note
+  
+  :Déterminer coefficient forme μ;
+  note right
+  **EN 13031-1:2019** [[https://www.google.fr Annexe C.3]]
+  end note
+  
+  if (Forme toiture ?) then (versants plats)
+    if (cas de charge?) then (distribution uniforme)
+      :μ selon Tableau C.4 ;
+      note right: [[https://www.google.fr section C.3.1]]
+    else (distribution non uniforme)
+      :μ selon Tableau C.5;
+      note right: [[https://www.google.fr section C.3.2]]
+    endif
+    
+  elseif (serres à toitures voûtées) then (oui)
+    :μ selon forme la pente β;
+    if (cas de charge?) then (distribution uniforme)
+    :μ selon Tableau C.4 ;
+      note right: [[https://www.google.fr section C.3.1]]
+    else (distribution non uniforme)
+      :μ selon Tableau C.6;
+      note right: [[https://www.google.fr section C.3.3]]
+    endif
+    if (α > 60°) then (oui)
+      :μ = 0 (pas accumulation);
+    endif
+  
+  endif
+  
+  :valeurs usuelles coefficient exposition Ce;
+  note right
+    • Normal: Ce = 1.0
+    • Exposé: Ce = 0.8  
+    • Abrité: Ce = 1.2
+  end note
+  
+  :Valeurs usuelles coefficient thermique Ct;
+  if (Chauffage structure ?) then (oui)
+    :Ct < 1.0 (réduction);
+  else (non)
+    :Ct = 1.0;
+  endif
+  
+  
+  :Calculer charge neige;
+  note right
+    **s = μ × Ce × Ct × sk**
+  end note
+}
+
+:Action de la neige terminé;
+note right
+  Prochaine étape :
+  **Calcul des combinaisons d'actions**
+  Voir fichier `portique_combi.puml`
+end note
+
+@enduml
