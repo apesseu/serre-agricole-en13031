@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main      # Déclenche quand tu pushes sur main
-    
+
 jobs:
   generate-and-deploy:
     runs-on: ubuntu-latest
@@ -38,12 +38,15 @@ jobs:
           echo "🔍 Recherche des fichiers .puml dans diagrams/"
           find diagrams -name "*.puml" || echo "⚠️ Aucun fichier .puml trouvé !"
 
-      # 5️⃣ Générer les SVG dans docs/
-      - name: Generate PlantUML diagrams
+      # 5️⃣ Génération des SVG en mode debug (fichier par fichier)
+      - name: Generate PlantUML diagrams (debug mode)
         run: |
           mkdir -p docs
           echo "📊 Génération des diagrammes PlantUML vers docs/"
-          java -jar plantuml.jar -tsvg -o ../docs diagrams/*.puml
+          for f in diagrams/*.puml; do
+            echo "➡️ Génération de $f"
+            java -jar plantuml.jar -tsvg -o ../docs "$f" || echo "❌ ERREUR sur $f"
+          done
           
           echo "📂 Contenu de docs/ après génération :"
           ls -la docs/
