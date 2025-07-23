@@ -206,14 +206,6 @@ partition "**CALCUL PRESSIONS NETTES**" {
     ze = hauteur référence paroi
   end note
   
-  :Vérifier pressions minimales;
-  if (Référentiel ?) then (EN 13031)
-    :we,min = 0.2 kN/m² (EN 13031);
-    note right: [[https://eurocodes.com/en13031-1-5-6 Art 5.6]]
-  else (EN 1991-1-4)
-    :we,min selon catégorie;
-    note right: [[https://eurocodes.com/en1991-1-4-5-2 Art 5.2]]
-  endif
 }
 
 :Action du vent terminé;
