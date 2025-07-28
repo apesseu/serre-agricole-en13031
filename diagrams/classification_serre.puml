@@ -1,0 +1,257 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam packageStyle rectangle
+skinparam partition {
+    BorderColor #2E86AB
+    BackgroundColor #F8F9FA
+}
+skinparam note {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+}
+
+title Dimensionnement Serres Agricoles - PARTIE 1/3\nClassification et Paramètres selon NF EN 13031-1
+caption Cliquez sur les éléments pour accéder aux clauses normatives correspondantes
+
+start
+
+partition "DONNÉES D'ENTRÉE"  {
+    :Collecte des données d'entrée;
+    note right
+    **ACTIONS À CONSIDÉRER :**
+    • Actions permanentes (G₁)
+    • Installations permanentes (G₂)  
+    • Actions du vent (Q₁)
+    • Actions de la neige (Q₂)
+    • Actions des cultures (Q₃)
+    
+    **PARAMÈTRES TECHNIQUES :**
+    • Classe de serre (A ou B)
+    • Durée de vie nominale (5, 10, 15 ans)
+    • Type de couverture et climat
+    • Dimensions (L × l)
+    • Documents du marché
+    end note
+}
+
+partition "CLASSIFICATION DE LA SERRE" {
+    :Déterminer la classe de serre;
+    note right: [[https://www.norme-en13031.fr/clause-5.2.4 Clause 5.2.4 - Classification des serres]]
+    
+    if (Durée de vie nominale ?) then (15 ans)
+        if (Tolérance déplacements ossature ?) then (Classe A)
+            :Classe A15;
+            note right: Serres de classe A avec durée de vie 15 ans
+        else (Classe B)
+            :Classe B15;
+            note right: Serres de classe B avec durée de vie 15 ans
+        endif
+    elseif (10 ans) then
+        if (Tolérance déplacements ossature ?) then (Classe A)
+            :Classe A10;
+        else (Classe B)
+            :Classe B10;
+        endif
+    else (5 ans)
+        :Classe B5;
+        note right: Seules les serres de classe B sont autorisées pour 5 ans
+    endif
+    
+    :Déterminer la catégorie selon le Tableau 8;
+    note right: [[https://www.norme-en13031.fr/tableau-8 Tableau 8 - Catégories de serres]]
+}
+
+partition "ANALYSE TYPE DE COUVERTURE" {
+    if (Type de couverture ?) then (Transparente - T)
+        :Couverture transparente;
+        note right
+        **MATÉRIAUX TRANSPARENTS :**
+        • Verre
+        • Film ou membrane plastique
+        • Feuilles plastiques à surface lisse
+        • BIPV (BiPV transparents)
+        end note
+        
+        if (Chauffage ?) then (Chauffé - C)
+            :Serre chauffée (min θᵢ en °C);
+            if (Transmission chaleur ?) then (Suffisante - S)
+                :Uo ≥ 1 W/(m²K);
+                if (Chauffage réglé ?) then (Réglé - R)
+                    :Cm = 1,333 / Ct ≤ 1;
+                else (Protégé gel - F)
+                    :Cm = 1,2* / Ct ≤ 1;
+                endif
+            else (Non suffisante - NS)
+                :Uo < 1 W/(m²K);
+                :Cm = 1,2* / Ct ≤ 1;
+            endif
+        else (Non chauffé - NC)
+            :Serre non chauffée;
+            :Cm = 1,2 / Ct = 1;
+        endif
+        
+    elseif (Non transparente - NT) then
+        :Couverture non transparente;
+        note right
+        **MATÉRIAUX NON TRANSPARENTS :**
+        • Tôles métalliques
+        • Structure sandwich
+        • Membrane en tissu
+        • BIPV opaques
+        end note
+        :Cm = 1,2 / Ct = 1;
+        
+    else (Surface non glissante)
+        :Autres surfaces;
+        note right
+        **AUTRES MATÉRIAUX :**
+        • Tuiles
+        • Surfaces granulées
+        • Toiture ouverte
+        • Auvent
+        • PV intégré
+        end note
+        :Cm = 1 / Ct = 1;
+    endif
+    
+    note right
+    **COEFFICIENTS THERMIQUES :**
+    • Cm : Coefficient thermique selon ISO 4355
+    • Ct : Coefficient du matériau de surface
+    • *En France métropolitaine : Ct = 1,0
+    end note
+}
+
+partition "COEFFICIENTS PARTIELS" {
+    :Récupération des coefficients partiels γ;
+    note right: [[https://www.norme-en13031.fr/tableau-4 Tableau 4 - Coefficients partiels]]
+    
+    floating note left
+    **COEFFICIENT D'AJUSTEMENT fs :**
+    Le coefficient fs ajuste les actions climatiques 
+    (vent/neige) selon la période de référence.
+    Il ne s'applique PAS aux combinaisons mais 
+    aux valeurs d'actions elles-mêmes.
+    end note
+    
+    :COEFFICIENTS ACTIONS DÉFAVORABLES;
+    :γG1 = 1,35 (ELU) / 1,0 (ELS) - Permanentes;
+    :γG2 = 1,35 (ELU) / 1,0 (ELS) - Installations;
+    :γQ1 = 1,5 (ELU) / 1,0 (ELS) - Vent;
+    :γQ2 = 1,5 (ELU) / 1,0 (ELS) - Neige;
+    :γQ3 = 1,5 (ELU) / 1,0 (ELS) - Cultures;
+    :γQ4 = 1,5 (ELU) / 0,0 (ELS) - Action verticale concentrée;
+    :γQ5 = 1,5 (ELU) / 1,0 (ELS) - Installations occasionnelles;
+    :γQ6 = 1,5 (ELU) / 1,0 (ELS) - Actions thermiques;
+    
+    :COEFFICIENTS ACTIONS FAVORABLES;
+    note right
+    [[https://www.norme-en13031.fr/note-coefficients Note sur les coefficients partiels]]
+    **Si l'action a un effet favorable :**
+    • Actions permanentes Gⱼ : γ = 1,0
+    • Actions variables Qⱼ : γ = 0,0  
+    • Action neige exceptionnelle A : γ = 0,0
+    end note
+}
+
+partition "COEFFICIENTS DE COMBINAISON" {
+    :Récupération des coefficients de combinaison ψ;
+    note right: [[https://www.norme-en13031.fr/tableau-5 Tableau 5 - Coefficients de combinaison]]
+    
+    :ψ₀₁ = 0,6 - Vent;
+    :ψ₀₂ = 0,6 - Neige;
+    :ψ₀₃ = 1,0 - Cultures;
+    
+    note right
+    **UTILISATION DES COEFFICIENTS ψ :**
+    • ψ₀ : Valeurs de combinaison
+    • Appliqués aux actions variables d'accompagnement
+    • L'action dominante n'est pas affectée par ψ
+    end note
+}
+
+partition "VÉRIFICATIONS PRÉLIMINAIRES"  {
+    :Vérifier les états limites appropriés;
+    note right: [[https://www.norme-en13031.fr/clause-5.1.1 Clause 5.1.1 - Généralités]]
+    
+    if (Classe de serre ?) then (Classe A)
+        :ELS et ELU obligatoires;
+        note right: [[https://www.norme-en13031.fr/clause-5.2.3.1 Clause 5.2.3.1 - Tolérance aux déplacements]]
+    else (Classe B)
+        :Seuls ELU obligatoires;
+        note right
+        **SIMPLIFICATION CLASSE B :**
+        Pour les serres de classe B, 
+        la vérification aux ELS 
+        n'est pas obligatoire
+        end note
+    endif
+    
+    if (Classe B ?) then (oui)
+        :Vérifications spécifiques Classe B;
+        
+        :Actions thermiques non obligatoires pour fils de fer de culture;
+        note right: [[https://www.norme-en13031.fr/clause-10.2.2.6 Clause 10.2.2.6 - Actions thermiques]]
+        
+        if (Longueur < 150m ET Largeur < 150m ?) then (oui)
+            :Actions thermiques non obligatoires;
+            note right
+            **EXEMPTION ACTIONS THERMIQUES :**
+            Classe B avec L < 150m et l < 150m
+            → Combinaison e1) non requise
+            end note
+        else (non)
+            :Actions thermiques obligatoires;
+            note right
+            **ACTIONS THERMIQUES REQUISES :**
+            Utiliser combinaison e1) + plages de température 
+            du Tableau 8 NF EN 13031-1
+            end note
+        endif
+    endif
+    
+    if (Documents du marché spécifient d1) et d2) ?) then (oui)
+        :Combinaisons d1) et d2) à considérer;
+        note right
+        [[https://www.norme-en13031.fr/note-d1d2 Note combinaisons d1) et d2)]]
+        **ACCORD CLIENT-FABRICANT :**
+        Coefficients partiels γᵢ à définir d'un commun 
+        accord entre client et fabricant
+        end note
+    else (non)
+        :Combinaisons d1) et d2) non nécessaires;
+    endif
+    
+    if (Spécifications charges aux chocs dans documents marché ?) then (oui)
+        :Tenir compte des charges dues aux chocs;
+        note right: [[https://www.norme-en13031.fr/clause-10.2.3.1 Clause 10.2.3.1 - Charges chocs]]
+    else (non)
+        :Charges dues aux chocs non nécessaires;
+        note right
+        **CHARGES AUX CHOCS :**
+        En l'absence de spécifications dans les documents 
+        du marché, il n'est pas nécessaire de tenir compte 
+        de charges dues aux chocs
+        end note
+    endif
+}
+
+:PARAMÈTRES DÉFINIS;
+note right
+**RÉSULTATS PARTIE 1 :**
+✓ Classe de serre déterminée
+✓ Coefficients γ et ψ définis
+✓ Vérifications préliminaires effectuées
+✓ Actions applicables identifiées
+
+**→ PASSAGE À LA PARTIE 2 :**
+Calcul des combinaisons ELU
+end note
+
+:CONTINUER VERS PARTIE 2 - COMBINAISONS ELU;
+
+stop
+
+@enduml

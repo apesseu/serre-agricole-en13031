@@ -1,0 +1,235 @@
+@startuml
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam packageStyle rectangle
+skinparam partition {
+    BorderColor #2E86AB
+    BackgroundColor #F8F9FA
+}
+skinparam note {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+}
+
+title Dimensionnement Serres Agricoles - PARTIE 2/3\nCombinaisons États Limites Ultimes (ELU) selon NF EN 13031-1
+caption Cliquez sur les éléments pour accéder aux clauses normatives correspondantes
+
+start
+
+:RÉCUPÉRATION DES PARAMÈTRES DE LA PARTIE 1;
+note right
+**PARAMÈTRES RÉCUPÉRÉS :**
+✓ Classe de serre (A ou B)
+✓ Coefficients partiels γ
+✓ Coefficients de combinaison ψ
+✓ Actions applicables identifiées
+✓ Vérifications préliminaires effectuées
+end note
+
+partition "PRINCIPE GÉNÉRAL ELU"  {
+    :Application du Tableau 3 - Combinaisons d'actions;
+    note right
+    [[https://www.norme-en13031.fr/clause-10.3 Clause 10.3 - Combinaisons d'actions]]
+    [[https://www.norme-en13031.fr/tableau-3 Tableau 3 - Combinaisons d'actions]]
+    **IMPORTANT :** Remplace le Tableau 9 de la NF EN 13031-1
+    end note
+    
+    :GESTION ACTIONS FAVORABLES/DÉFAVORABLES;
+    note right
+    **RÈGLE FONDAMENTALE :**
+    Pour chaque action, déterminer si elle est favorable ou défavorable :
+    • Si DÉFAVORABLE : utiliser γ du Tableau 4
+    • Si FAVORABLE : γG = 1,0 pour permanentes, γQ = 0,0 pour variables
+    Appliquer ensuite le coefficient fs selon la classe
+    end note
+}
+
+partition "COMBINAISONS PRINCIPALES (a)" {
+    :COMBINAISON a1);
+    :Permanente + Installations + Vent + Neige + Cultures;
+    :Ed = γG1×G1 + γG2×G2 + γQ1×Q1 + ψ02×γQ2×Q2 + ψ03×γQ3×Q3;
+    note right
+    **a1) COMBINAISON COMPLÈTE**
+    Action dominante : Vent
+    Exemple actions défavorables :
+    Ed = 1,35×G1 + 1,35×G2 + 1,5×Q1 + 0,6×1,5×Q2 + 1,0×1,5×Q3
+    end note
+    
+    :COMBINAISON a2)-1;
+    :Permanente + Installations + Neige + Cultures;
+    :Ed = γG1×G1 + γG2×G2 + γQ2×Q2 + ψ03×γQ3×Q3;
+    note right
+    **a2)-1 NEIGE DOMINANTE**
+    Sans vent concomitant
+    end note
+    
+    :COMBINAISON a2)-2;
+    :Permanente + Installations + Vent + Neige + Cultures;
+    :Ed = γG1×G1 + γG2×G2 + ψ01×γQ1×Q1 + γQ2×Q2 + ψ03×γQ3×Q3;
+    note right
+    **a2)-2 NEIGE DOMINANTE**
+    Avec vent concomitant
+    end note
+    
+    :COMBINAISON a3);
+    :Permanente + Installations + Neige;
+    :Ed = γG1×G1 + γG2×G2 + γQ2×Q2;
+    note right
+    **a3) NEIGE SEULE**
+    Sans autres actions variables
+    end note
+    
+    :COMBINAISON a4);
+    :Permanente + Installations + Vent + Neige;
+    :Ed = γG1×G1 + γG2×G2 + ψ01×γQ1×Q1 + ψ02×γQ2×Q2;
+    note right
+    **a4) VENT ET NEIGE CONCOMITANTS**
+    Actions climatiques combinées
+    end note
+    
+    :COMBINAISON a5)-1;
+    :Permanente + Installations + Vent + Cultures;
+    :Ed = γG1×G1 + γG2×G2 + γQ1×Q1 + ψ03×γQ3×Q3;
+    note right
+    **a5)-1 VENT DOMINANT**
+    Avec cultures d'accompagnement
+    end note
+    
+    :COMBINAISON a5)-2;
+    :Permanente + Installations + Vent;
+    :Ed = γG1×G1 + γG2×G2 + ψ01×γQ1×Q1;
+    note right
+    **a5)-2 VENT CONCOMITANT**
+    Action d'accompagnement uniquement
+    end note
+}
+
+partition "COMBINAISONS SIMPLIFIÉES (b)" {
+    :COMBINAISON b1);
+    :Permanente + Vent;
+    :Ed = γG1×G1 + γQ1×Q1;
+    note right
+    **b1) STRUCTURE SIMPLIFIÉE**
+    Vent dominant sur structure 
+    sans installations permanentes
+    end note
+}
+
+partition "COMBINAISONS SPÉCIALES (c)" {
+    :COMBINAISON c1);
+    :Permanente + Installations + Cultures + Action verticale concentrée;
+    :Ed = γG1×G1 + γG2×G2 + ψ03×γQ3×Q3 + γQ4×Q4;
+    note right
+    **c1) ACTION VERTICALE CONCENTRÉE**
+    Charges de maintenance, réparation
+    Action dominante : Q4
+    end note
+    
+    :COMBINAISON c2);
+    :Permanente + Installations + Cultures + Installations occasionnelles;
+    :Ed = γG1×G1 + γG2×G2 + ψ03×γQ3×Q3 + γQ5×Q5;
+    note right
+    **c2) INSTALLATIONS OCCASIONNELLES**
+    Équipements temporaires
+    Action dominante : Q5
+    end note
+}
+
+partition "COMBINAISONS CONTRACTUELLES (d)" {
+    if (Combinaisons d1) et d2) requises ?) then (oui)
+        :COMBINAISONS d1) et d2);
+        :Selon accord client/fabricant;
+        :Ed = formule selon accord;
+        note right
+        **COMBINAISONS CONTRACTUELLES**
+        Coefficients partiels γᵢ à définir 
+        d'un commun accord entre 
+        client et fabricant
+        [[https://www.norme-en13031.fr/note-d1d2 Note d1) et d2)]]
+        end note
+    else (non)
+        :Combinaisons d1) et d2) non applicables;
+    endif
+}
+
+partition "COMBINAISONS THERMIQUES (e)" {
+    if (Actions thermiques requises ?) then (oui)
+        :COMBINAISON e1);
+        :Permanente + Installations + Thermique;
+        :Ed = γG1×G1 + γG2×G2 + γQ6×Q6;
+        note right
+        **e1) ACTIONS THERMIQUES**
+        • Dilatations/contractions thermiques
+        • Plages de température du Tableau 8
+        • NON requise pour classe B si L<150m et l<150m
+        [[https://www.norme-en13031.fr/clause-10.2.2.6 Clause 10.2.2.6]]
+        end note
+    else (non)
+        :Combinaison e1) non applicable;
+        note right
+        **EXEMPTION CLASSE B**
+        Dimensions < 150m × 150m
+        end note
+    endif
+}
+
+partition "SITUATIONS ACCIDENTELLES (f)" {
+    :COMBINAISON f1);
+    :Permanente + Installations + Cultures + Neige exceptionnelle;
+    :Ed = γG1×G1 + γG2×G2 + ψ03×γQ3×Q3 + γA×A;
+    note right
+    **f1) NEIGE EXCEPTIONNELLE**
+    Situation accidentelle
+    • γA = 1,0 si défavorable
+    • γA = 0,0 si favorable
+    • Action exceptionnelle dominante
+    end note
+}
+
+partition "RÉCAPITULATIF COMBINAISONS ELU" {
+    :Synthèse des combinaisons applicables;
+    note right
+    **TABLEAU DE SYNTHÈSE :**
+    
+    **COMBINAISONS PRINCIPALES :**
+    • a1) : Toutes actions avec vent dominant
+    • a2)-1 : Neige dominante sans vent
+    • a2)-2 : Neige dominante avec vent
+    • a3) : Neige seule
+    • a4) : Vent + neige concomitants
+    • a5)-1 : Vent dominant + cultures
+    • a5)-2 : Vent concomitant seul
+    
+    **COMBINAISONS SPÉCIALES :**
+    • b1) : Structure simplifiée + vent
+    • c1) : Action verticale concentrée
+    • c2) : Installations occasionnelles
+    • e1) : Actions thermiques (si requises)
+    • f1) : Neige exceptionnelle
+    
+    **COMBINAISONS CONTRACTUELLES :**
+    • d1), d2) : Si spécifiées au marché
+    end note
+    
+    :Toutes les combinaisons ELU calculées;
+    note right
+    **RÉSULTATS PARTIE 2 :**
+    ✓ Toutes combinaisons ELU déterminées
+    ✓ Actions favorables/défavorables traitées
+    ✓ Coefficients appliqués selon la classe
+    ✓ Cas particuliers pris en compte
+    
+    **→ PASSAGE À LA PARTIE 3 :**
+    • ELS (si Classe A)
+    • Sélection combinaison dimensionnante
+    • Vérifications finales
+    end note
+}
+
+:CONTINUER VERS PARTIE 3 - ELS ET FINALISATION;
+
+stop
+
+@enduml

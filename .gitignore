@@ -8,3 +8,4 @@ diagrams/*.svg
 # Ignorer les fichiers systèmes
 .DS_Store
 Thumbs.db
+diagrams/portique_combi.puml

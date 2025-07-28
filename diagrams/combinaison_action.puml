@@ -1,0 +1,240 @@
+@startuml
+
+title Actions Favorables/Défavorables - NF EN 13031-1/NA\nMéthode de Détermination des Coefficients
+start
+!theme aws-orange
+:**PRINCIPE FONDAMENTAL**
+Action FAVORABLE = s'oppose à l'action principale → γ réduit
+Action DÉFAVORABLE = aggrave l'action principale → γ normal;
+
+partition "**DÉCOMPOSITION DE TOUTE COMBINAISON**" {
+    :**IDENTIFIER LES 3 TYPES D'ACTIONS**;
+    
+    :**PERMANENTES** (G1, G2)
+    Toujours présentes
+    γ = 1,35 ou 1,0;
+    
+    :**VARIABLE PRINCIPALE** 
+    Celle SANS ψ devant
+    γ = coefficient plein;
+    
+    :**VARIABLES D'ACCOMPAGNEMENT**
+    Celles AVEC ψ devant  
+    γ × ψ = coefficient réduit;
+}
+
+:**QUELLE EST L'ACTION PRINCIPALE ?**;
+
+switch (Action principale identifiée)
+
+case (VENT Q1)
+    partition "**VENT PRINCIPAL**" {
+        :**Combinaisons concernées**
+        a1), a5)-1, a5)-2, b1);
+        
+        if (Signe (Cpe-Cpi) ?) then (< 0)
+            :**SUCCION vers le haut**;
+            
+            :**ACTIONS FAVORABLES**
+            G1, G2, Q2, Q3, Q4, Q5 → γ réduit
+            **Raison:** Toutes vers le bas, compensent succion;
+            
+            :**ACTION DÉFAVORABLE** 
+            Q1 → γ = 1,5 (ELU) / 1,0 (ELS)
+            **Raison:** Action principale;
+            
+        else (≥ 0)
+            :**PRESSION vers le bas**;
+            
+            :**ACTIONS DÉFAVORABLES**
+            G1, G2, Q1, Q2, Q3, Q4, Q5 → γ normal
+            **Raison:** Toutes vers le bas, même sens;
+            
+        endif
+    }
+
+case (NEIGE Q2)
+    partition "**NEIGE PRINCIPALE**" {
+        :**Combinaisons concernées**
+        a2)-1, a2)-2, a3);
+        
+        :**NEIGE toujours vers le bas**;
+        
+        :**ACTIONS DÉFAVORABLES**
+        G1, G2, Q2, Q3, Q4, Q5 → γ normal
+        **Raison:** Toutes vers le bas, même sens;
+        
+        if (Q1 présent dans combinaison ?) then (oui)
+            if (Signe (Cpe-Cpi) ?) then (< 0)
+                :**VENT FAVORABLE**
+                Q1 → γ = 0,0
+                **Raison:** Succion peut souffler neige;
+            else (≥ 0)
+                :**VENT DÉFAVORABLE**
+                Q1 → γ normal
+                **Raison:** Pression aggrave neige;
+            endif
+        endif
+    }
+
+case (CULTURES Q3)
+    partition "**CULTURES PRINCIPALES**" {
+        :**Combinaisons concernées**
+        a5)-1, a5)-2;
+        
+        :**CULTURES toujours vers le bas**;
+        
+        :**ACTIONS DÉFAVORABLES**
+        G1, G2, Q2, Q3, Q4, Q5 → γ normal
+        **Raison:** Toutes vers le bas, même sens;
+        
+        if (Signe (Cpe-Cpi) ?) then (< 0)
+            :**VENT FAVORABLE**
+            Q1 → γ = 0,0
+            **Raison:** Succion allège cultures;
+        else (≥ 0)
+            :**VENT DÉFAVORABLE**  
+            Q1 → γ normal
+            **Raison:** Pression aggrave cultures;
+        endif
+    }
+
+case (MAINTENANCE Q4)
+    partition "**MAINTENANCE PRINCIPALE**" {
+        :**Combinaisons concernées**
+        c1);
+        
+        :**ACTION CONCENTRÉE vers le bas**;
+        
+        :**ACTIONS DÉFAVORABLES**
+        G1, G2, Q3, Q4 → γ normal
+        **Raison:** Toutes vers le bas, même sens;
+    }
+
+case (OCCASIONNELLES Q5)
+    partition "**OCCASIONNELLES PRINCIPALES**" {
+        :**Combinaisons concernées**
+        c2);
+        
+        :**ÉQUIPEMENTS TEMPORAIRES vers le bas**;
+        
+        :**ACTIONS DÉFAVORABLES**
+        G1, G2, Q3, Q5 → γ normal
+        **Raison:** Toutes vers le bas, même sens;
+    }
+
+case (THERMIQUE Q6)
+    partition "**THERMIQUE PRINCIPALE**" {
+        :**Combinaisons concernées**
+        e1);
+        
+        :**DILATATION/CONTRACTION**;
+        
+        :**ACTIONS FAVORABLES**
+        G1, G2, Q1, Q2, Q3, Q4, Q5 → γ réduit
+        **Raison:** N'aggravent pas contraintes thermiques;
+        
+        :**ACTION DÉFAVORABLE**
+        Q6 → γ = 1,5 (ELU) / 1,0 (ELS)
+        **Raison:** Action principale;
+    }
+
+case (NEIGE EXCEPTIONNELLE A)
+    partition "**NEIGE EXCEPTIONNELLE PRINCIPALE**" {
+        :**Combinaisons concernées**
+        f1);
+        
+        :**SURCHARGE EXTRÊME vers le bas**;
+        
+        :**ACTIONS DÉFAVORABLES**
+        G1, G2, Q2, Q3, A → γ normal
+        **Raison:** Toutes vers le bas, même sens;
+        
+        if (Signe (Cpe-Cpi) ?) then (< 0)
+            :**VENT FAVORABLE**
+            Q1 → γ = 0,0
+            **Raison:** Succion peut souffler neige;
+        else (≥ 0)
+            :**VENT DÉFAVORABLE**
+            Q1 → γ normal;
+        endif
+    }
+
+endswitch
+
+partition "**APPLICATION DES COEFFICIENTS**" {
+    
+    switch (État limite)
+    case (ELU)
+        :**COEFFICIENTS ELU**
+        
+        **FAVORABLES:**
+        • γG = 1,0
+        • γQ = 0,0  
+        • γA = 0,0
+        
+        **DÉFAVORABLES:**
+        • γG1, γG2 = 1,35
+        • γQ1...γQ6 = 1,5
+        • γA = 1,0;
+        
+    case (ELS)
+        :**COEFFICIENTS ELS**
+        
+        **TOUS:**
+        • γG1, γG2 = 1,0
+        • γQ1, γQ2, γQ3, γQ5, γQ6 = 1,0
+        • γQ4 = 0,0
+        • γA = 0,0;
+        
+    endswitch
+    
+    :**COEFFICIENTS ψ (Tableau 5)**
+    
+    **Valeurs principales:**
+    • ψQ1 = 0,6 (vent accompagnement)
+    • ψQ2 = 0,6 (neige accompagnement)  
+    • ψQ3 = 1,0 (cultures accompagnement);
+    
+    :**COEFFICIENT fs (Tableau 2)**
+    
+    **Actions variables × fs:**
+    • A15/B15: fs = 0,708
+    • B10: fs = 0,610
+    • B5: fs = 0,444;
+}
+
+partition "**CAS PARTICULIERS**" {
+    
+    if (Classe B5 ?) then (oui)
+        :**CULTURES EXEMPTÉES**
+        γQ3 = 0,0 dans a1), a2)-1, a2)-2, 
+        a3), a4), f1);
+        note right: Tableau 5 Note (a)
+    endif
+    
+    if (Type B ET (L<150m ET l<150m) ?) then (oui)
+        :**THERMIQUE EXEMPTÉE**
+        γQ6 = 0,0;
+        note right: Clause 10.2.2.6
+    endif
+    
+    if (Fils de fer de culture ?) then (oui)
+        :**THERMIQUE EXEMPTÉE**
+        γQ6 = 0,0;
+        note right: Clause 10.2.2.6
+    endif
+}
+
+:**FORMULE FINALE**
+Ed = Σ(γG×Gk) + γQ,main×Qk,main + Σ(ψ×γQ×Qk,acc) × fs
+
+**Références NF EN 13031-1/NA:**
+• Tableau 3: Combinaisons d'actions
+• Tableau 4: Coefficients partiels γ  
+• Tableau 5: Coefficients de combinaison ψ
+• Tableau 2: Coefficients d'ajustement fs;
+
+stop
+
+@enduml
